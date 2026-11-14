@@ -1,0 +1,6 @@
+{% if form.errors %}
+  <div class="aviso aviso--error" role="alert">
+    Revisa los campos marcados antes de guardar.
+    {% for error in form.non_field_errors %}<br>{{ error }}{% endfor %}
+  </div>
+{% endif %}

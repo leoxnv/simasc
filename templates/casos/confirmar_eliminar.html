@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block titulo %}Quitar del asunto{% endblock %}
+
+{% block contenido %}
+<div class="angosto">
+  <nav class="migas" aria-label="Ubicación">
+    <a href="{% url 'casos:lista' %}">Asuntos</a>
+    <a href="{% url 'casos:detalle' asunto.pk %}">{{ asunto.folio }}</a>
+  </nav>
+  <h1>¿Quitar este registro?</h1>
+  <form method="post" class="tarjeta">
+    {% csrf_token %}
+    <p><strong>{{ object }}</strong></p>
+    <p>Se quitará del asunto {{ asunto.folio }}. Queda constancia en la bitácora de quién lo quitó y cuándo.</p>
+    <div class="acciones">
+      <button class="boton boton--peligro" type="submit">Sí, quitar</button>
+      <a class="boton boton--discreto" href="{% url 'casos:detalle' asunto.pk %}">No, conservar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

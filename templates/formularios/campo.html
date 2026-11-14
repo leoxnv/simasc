@@ -1,0 +1,13 @@
+<div class="campo{% if field.errors %} campo--error{% endif %}{% if field.use_fieldset %} campo--opciones{% endif %}">
+  {% if field.use_fieldset %}
+    <fieldset>
+      <legend>{{ field.label }}{% if field.field.required %} <span class="req" title="Obligatorio">*</span>{% endif %}</legend>
+      {{ field }}
+    </fieldset>
+  {% else %}
+    <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="req" title="Obligatorio">*</span>{% endif %}</label>
+    {{ field }}
+  {% endif %}
+  {% if field.help_text %}<p class="ayuda">{{ field.help_text }}</p>{% endif %}
+  {% for error in field.errors %}<p class="error">{{ error }}</p>{% endfor %}
+</div>

@@ -1,0 +1,48 @@
+<section class="tarjeta">
+  <div class="seccion-encabezado">
+    <h2 class="seccion seccion--primera">{{ titulo }} <span class="conteo">{{ personas|length }}</span></h2>
+    {% if puede_editar %}
+      <a class="boton" href="{% url 'casos:persona_crear' asunto.pk tipo %}">{{ agregar }}</a>
+    {% endif %}
+  </div>
+  {% if personas %}
+    <div class="tabla-contenedor">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th class="num">Núm.</th>
+            <th>Nombre</th>
+            <th>Sexo</th>
+            <th class="num">Edad</th>
+            <th>Adulto o adolescente</th>
+            <th>Calidad</th>
+            {% if puede_editar %}<th><span class="solo-lectores">Acciones</span></th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for persona in personas %}
+            <tr>
+              <td class="num">{{ persona.numero }}</td>
+              <td>
+                {{ persona.nombre_completo }}
+                {% if persona.tipo_persona == "moral" %}<span class="etiqueta">Persona moral</span>{% endif %}
+              </td>
+              <td>{{ persona.get_sexo_display|default:"—" }}</td>
+              <td class="num">{{ persona.edad|default_if_none:"—" }}</td>
+              <td>{{ persona.get_grupo_etario_display|default:"—" }}</td>
+              <td>{{ persona.get_calidad_display|default:"—" }}</td>
+              {% if puede_editar %}
+                <td class="fila-acciones">
+                  <a href="{% url 'casos:persona_editar' asunto.pk persona.pk %}">Editar</a>
+                  <a class="enlace-peligro" href="{% url 'casos:persona_eliminar' asunto.pk persona.pk %}">Quitar</a>
+                </td>
+              {% endif %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="vacio-seccion">{{ vacio }}</p>
+  {% endif %}
+</section>

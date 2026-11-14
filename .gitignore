@@ -1,0 +1,8 @@
+.env
+.venv
+.venv.nosync/
+__pycache__/
+*.pyc
+datos/*.sqlite3*
+staticfiles/
+.DS_Store

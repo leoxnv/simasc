@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block titulo %}Delito · {{ asunto.folio }}{% endblock %}
+
+{% block contenido %}
+<nav class="migas" aria-label="Ubicación">
+  <a href="{% url 'casos:lista' %}">Asuntos</a>
+  <a href="{% url 'casos:detalle' asunto.pk %}">{{ asunto.folio }}</a>
+</nav>
+<h1>{% if object.pk %}Editar delito{% else %}Agregar delito{% endif %}</h1>
+
+<form method="post" class="tarjeta">
+  {% csrf_token %}
+  {% include "formularios/errores.html" %}
+
+  <h2 class="seccion seccion--primera">Personas involucradas</h2>
+  <div class="rejilla">
+    {{ form.victima.as_field_group }}
+    {% if form.imputados.field.queryset.exists %}
+      {{ form.imputados.as_field_group }}
+    {% else %}
+      <p class="ayuda">Este asunto aún no tiene imputados registrados. Puedes ligarlos al delito después.</p>
+    {% endif %}
+  </div>
+
+  <h2 class="seccion">Tipo penal</h2>
+  <div class="rejilla rejilla--tres">
+    {{ form.subtipo.as_field_group }}
+    {{ form.articulo.as_field_group }}
+    {{ form.sufijo.as_field_group }}
+  </div>
+  {{ form.bien_juridico.as_field_group }}
+
+  <h2 class="seccion">Clasificación</h2>
+  <div class="rejilla rejilla--tres">
+    {{ form.gravedad.as_field_group }}
+    {{ form.forma_comision.as_field_group }}
+    {{ form.forma_accion.as_field_group }}
+  </div>
+  <div class="rejilla">
+    {{ form.modalidad.as_field_group }}
+    <div></div>
+    {{ form.instrumento.as_field_group }}
+    <div data-depende-de="instrumento" data-valores="dos_o_mas,otro">
+      {{ form.instrumento_especifique.as_field_group }}
+    </div>
+    {{ form.ambito.as_field_group }}
+    <div data-depende-de="ambito" data-valores="otro">
+      {{ form.ambito_especifique.as_field_group }}
+    </div>
+  </div>
+
+  <h2 class="seccion">Lugar del hecho</h2>
+  <div class="rejilla rejilla--tres">
+    {{ form.lugar_calle_numero.as_field_group }}
+    {{ form.lugar_colonia.as_field_group }}
+    {{ form.lugar_municipio.as_field_group }}
+  </div>
+  <div class="rejilla">
+    {{ form.lugar_referencias.as_field_group }}
+    {{ form.lugar_otros_datos.as_field_group }}
+  </div>
+
+  <div class="acciones">
+    <button class="boton boton--primario" type="submit">Guardar delito</button>
+    <a class="boton boton--discreto" href="{% url 'casos:detalle' asunto.pk %}">Descartar</a>
+  </div>
+</form>
+{% endblock %}

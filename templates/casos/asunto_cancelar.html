@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block titulo %}Cancelar {{ asunto.folio }}{% endblock %}
+
+{% block contenido %}
+<div class="angosto">
+  <nav class="migas" aria-label="Ubicación">
+    <a href="{% url 'casos:lista' %}">Asuntos</a>
+    <a href="{% url 'casos:detalle' asunto.pk %}">{{ asunto.folio }}</a>
+  </nav>
+  <h1>Cancelar el asunto {{ asunto.folio }}</h1>
+  <form method="post" class="tarjeta">
+    {% csrf_token %}
+    <p>El asunto seguirá visible con la marca «Cancelado», pero nadie podrá modificarlo. Esta acción queda en la bitácora y no se puede deshacer desde aquí.</p>
+    {% include "formularios/errores.html" %}
+    {{ form.motivo_cancelacion.as_field_group }}
+    <div class="acciones">
+      <button class="boton boton--peligro" type="submit">Cancelar el asunto</button>
+      <a class="boton boton--discreto" href="{% url 'casos:detalle' asunto.pk %}">Conservarlo</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

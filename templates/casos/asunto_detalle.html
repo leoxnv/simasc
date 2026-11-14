@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block titulo %}{{ asunto.folio }}{% endblock %}
+
+{% block contenido %}
+<nav class="migas" aria-label="Ubicación">
+  <a href="{% url 'casos:lista' %}">Asuntos</a>
+</nav>
+
+<div class="encabezado">
+  <div>
+    <h1>
+      Asunto {{ asunto.folio }}
+      {% if asunto.cancelado %}<span class="etiqueta etiqueta--peligro">Cancelado</span>{% endif %}
+    </h1>
+    <p class="encabezado__nota">
+      Capturó {{ asunto.creado_por.nombre_visible }} el {{ asunto.creado_en|date:"d/m/Y H:i" }}
+      · última modificación {{ asunto.actualizado_en|date:"d/m/Y H:i" }}
+    </p>
+  </div>
+  {% if puede_editar %}
+    <div class="encabezado__acciones">
+      <a class="boton" href="{% url 'casos:editar' asunto.pk %}">Editar datos</a>
+      {% if user.puede_supervisar %}
+        <a class="boton boton--peligro" href="{% url 'casos:cancelar' asunto.pk %}">Cancelar asunto</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+
+{% if asunto.cancelado %}
+  <div class="aviso aviso--error">
+    <strong>Este asunto fue cancelado y ya no puede modificarse.</strong><br>
+    Motivo: {{ asunto.motivo_cancelacion }}
+  </div>
+{% endif %}
+
+<section class="tarjeta">
+  <h2 class="seccion seccion--primera">Datos generales</h2>
+  <dl class="ficha">
+    <div><dt>Fecha de ingreso</dt><dd>{{ asunto.fecha_ingreso|date:"d/m/Y" }}</dd></div>
+    <div><dt>Carpeta de investigación</dt><dd>{{ asunto.carpeta_investigacion|default:"Sin carpeta" }}</dd></div>
+    <div><dt>NUC</dt><dd>{{ asunto.nuc|default:"Sin registrar" }}</dd></div>
+    <div><dt>Sistema de justicia</dt><dd>{{ asunto.get_sistema_display }}</dd></div>
+    <div><dt>Sede que lleva el asunto</dt><dd>{{ asunto.sede|default_if_none:"Sin sede" }}</dd></div>
+    <div><dt>Unidad de origen</dt><dd>{{ asunto.unidad_origen }}</dd></div>
+    <div><dt>Municipio de origen</dt><dd>{{ asunto.municipio_origen }}</dd></div>
+    <div>
+      <dt>Tipo de derivación</dt>
+      <dd>{{ asunto.get_tipo_derivacion_display }}{% if asunto.tipo_derivacion_otra %}: {{ asunto.tipo_derivacion_otra }}{% endif %}</dd>
+    </div>
+    <div><dt>Admisibilidad</dt><dd>{{ asunto.get_admisible_display }}</dd></div>
+  </dl>
+</section>
+
+{% include "casos/_personas.html" with titulo="Víctimas u ofendidos" personas=victimas tipo="victima" agregar="Agregar víctima u ofendido" vacio="Aún no hay víctimas u ofendidos registrados." %}
+{% include "casos/_personas.html" with titulo="Imputados" personas=imputados tipo="imputado" agregar="Agregar imputado" vacio="Aún no hay imputados registrados." %}
+
+<section class="tarjeta">
+  <div class="seccion-encabezado">
+    <h2 class="seccion seccion--primera">Delitos <span class="conteo">{{ delitos|length }}</span></h2>
+    {% if puede_editar %}
+      <a class="boton" href="{% url 'casos:delito_crear' asunto.pk %}">Agregar delito</a>
+    {% endif %}
+  </div>
+  {% for delito in delitos %}
+    <article class="delito">
+      <div class="delito__encabezado">
+        <h3>{{ delito.subtipo }} <span class="delito__articulo">art. {{ delito.articulo }}{% if delito.sufijo %} {{ delito.sufijo }}{% endif %}</span></h3>
+        {% if puede_editar %}
+          <div class="fila-acciones">
+            <a href="{% url 'casos:delito_editar' asunto.pk delito.pk %}">Editar</a>
+            <a class="enlace-peligro" href="{% url 'casos:delito_eliminar' asunto.pk delito.pk %}">Quitar</a>
+          </div>
+        {% endif %}
+      </div>
+      <p class="delito__etiquetas">
+        <span class="etiqueta">{{ delito.get_gravedad_display }}</span>
+        <span class="etiqueta">{{ delito.get_forma_comision_display }}</span>
+        <span class="etiqueta">{{ delito.get_forma_accion_display }}</span>
+        <span class="etiqueta">{{ delito.get_modalidad_display }}</span>
+      </p>
+      <dl class="ficha ficha--compacta">
+        <div><dt>Víctima u ofendido</dt><dd>{{ delito.victima.numero }}. {{ delito.victima.nombre_completo }}</dd></div>
+        <div>
+          <dt>Imputados</dt>
+          <dd>{% for imputado in delito.imputados.all %}{{ imputado.numero }}. {{ imputado.nombre_completo }}{% if not forloop.last %}; {% endif %}{% empty %}Sin ligar{% endfor %}</dd>
+        </div>
+        <div><dt>Bien jurídico tutelado</dt><dd>{{ delito.get_bien_juridico_display }}</dd></div>
+        <div>
+          <dt>Instrumento</dt>
+          <dd>{{ delito.get_instrumento_display }}{% if delito.instrumento_especifique %}: {{ delito.instrumento_especifique }}{% endif %}</dd>
+        </div>
+        <div>
+          <dt>Ámbito del hecho</dt>
+          <dd>{{ delito.get_ambito_display }}{% if delito.ambito_especifique %}: {{ delito.ambito_especifique }}{% endif %}</dd>
+        </div>
+        <div>
+          <dt>Lugar del hecho</dt>
+          <dd>
+            {% if delito.lugar_calle_numero or delito.lugar_colonia or delito.lugar_municipio %}
+              {{ delito.lugar_calle_numero }}{% if delito.lugar_colonia %}, {{ delito.lugar_colonia }}{% endif %}{% if delito.lugar_municipio %}, {{ delito.lugar_municipio }}{% endif %}
+            {% else %}Sin registrar{% endif %}
+          </dd>
+        </div>
+      </dl>
+    </article>
+  {% empty %}
+    <p class="vacio-seccion">Aún no hay delitos registrados.</p>
+  {% endfor %}
+</section>
+{% endblock %}

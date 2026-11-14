@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block titulo %}{% if object %}Editar {{ object.folio }}{% else %}Nuevo asunto{% endif %}{% endblock %}
+
+{% block contenido %}
+<nav class="migas" aria-label="Ubicación">
+  <a href="{% url 'casos:lista' %}">Asuntos</a>
+  {% if object %}<a href="{% url 'casos:detalle' object.pk %}">{{ object.folio }}</a>{% endif %}
+</nav>
+<h1>{% if object %}Editar datos del asunto{% else %}Nuevo asunto{% endif %}</h1>
+
+<form method="post" class="tarjeta">
+  {% csrf_token %}
+  {% include "formularios/errores.html" %}
+
+  <h2 class="seccion">Identificación</h2>
+  <div class="rejilla">
+    {{ form.folio.as_field_group }}
+    {{ form.fecha_ingreso.as_field_group }}
+    {{ form.carpeta_investigacion.as_field_group }}
+    {{ form.nuc.as_field_group }}
+  </div>
+  <p class="ayuda ayuda--bloque">Captura la carpeta de investigación, el NUC o ambos. Basta con uno.</p>
+  {{ form.sistema.as_field_group }}
+
+  <h2 class="seccion">Origen</h2>
+  <div class="rejilla">
+    {% if form.sede %}{{ form.sede.as_field_group }}<div></div>{% endif %}
+    {{ form.unidad_origen.as_field_group }}
+    {{ form.municipio_origen.as_field_group }}
+    {{ form.tipo_derivacion.as_field_group }}
+    <div data-depende-de="tipo_derivacion" data-valores="otra">
+      {{ form.tipo_derivacion_otra.as_field_group }}
+    </div>
+  </div>
+
+  <h2 class="seccion">Admisibilidad</h2>
+  {{ form.admisible.as_field_group }}
+
+  <div class="acciones">
+    <button class="boton boton--primario" type="submit">
+      {% if object %}Guardar cambios{% else %}Registrar asunto{% endif %}
+    </button>
+    <a class="boton boton--discreto"
+       href="{% if object %}{% url 'casos:detalle' object.pk %}{% else %}{% url 'casos:lista' %}{% endif %}">Descartar</a>
+  </div>
+</form>
+{% endblock %}

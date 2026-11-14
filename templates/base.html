@@ -1,0 +1,51 @@
+{% load static %}<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Asuntos{% endblock %} · SIMASC</title>
+  <link rel="stylesheet" href="{% static 'css/simasc.css' %}">
+</head>
+<body class="{% block clase_body %}{% endblock %}">
+  {% block barra %}
+  <header class="barra">
+    <div class="barra__interior">
+      <a class="marca" href="{% url 'casos:lista' %}">
+        <span class="marca__sigla">SIMASC</span>
+        <span class="marca__institucion">{{ INSTITUCION }}</span>
+      </a>
+      <nav class="navegacion" aria-label="Principal">
+        <a href="{% url 'casos:lista' %}">Asuntos</a>
+        {% if user.es_administrador %}
+          <a href="{% url 'casos:bitacora' %}">Bitácora</a>
+          <a href="{% url 'admin:index' %}">Administración</a>
+        {% endif %}
+      </nav>
+      <div class="sesion">
+        <a class="sesion__usuario" href="{% url 'password_change' %}" title="Cambiar mi contraseña">
+          <strong>{{ user.nombre_visible }}</strong>
+          <span>{{ user.get_rol_display }}</span>
+        </a>
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button class="boton boton--discreto" type="submit">Salir</button>
+        </form>
+      </div>
+    </div>
+  </header>
+  {% endblock %}
+
+  <main class="contenido">
+    {% if messages %}
+      <ul class="avisos">
+        {% for mensaje in messages %}
+          <li class="aviso aviso--{{ mensaje.level_tag }}" role="status">{{ mensaje }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% block contenido %}{% endblock %}
+  </main>
+
+  <script src="{% static 'js/simasc.js' %}" defer></script>
+</body>
+</html>

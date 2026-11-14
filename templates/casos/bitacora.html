@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block titulo %}Bitácora{% endblock %}
+
+{% block contenido %}
+<h1>Bitácora</h1>
+<p class="encabezado__nota">Quién hizo qué y cuándo. Los registros de la bitácora no se pueden editar ni borrar desde el sistema.</p>
+
+<nav class="pestanas" aria-label="Tipo de registro">
+  <a href="?ver=asuntos" {% if ver == "asuntos" %}aria-current="page"{% endif %}>Asuntos</a>
+  <a href="?ver=personas" {% if ver == "personas" %}aria-current="page"{% endif %}>Personas</a>
+  <a href="?ver=delitos" {% if ver == "delitos" %}aria-current="page"{% endif %}>Delitos</a>
+  <a href="?ver=accesos" {% if ver == "accesos" %}aria-current="page"{% endif %}>Accesos al sistema</a>
+</nav>
+
+<div class="tarjeta tarjeta--tabla">
+  {% if ver == "accesos" %}
+    <table class="tabla">
+      <thead><tr><th>Fecha</th><th>Evento</th><th>Usuario</th><th>Dirección IP</th></tr></thead>
+      <tbody>
+        {% for evento in pagina %}
+          <tr>
+            <td class="sin-corte">{{ evento.fecha|date:"d/m/Y H:i:s" }}</td>
+            <td>
+              {% if evento.tipo == "fallido" %}<span class="etiqueta etiqueta--peligro">{{ evento.get_tipo_display }}</span>
+              {% else %}{{ evento.get_tipo_display }}{% endif %}
+            </td>
+            <td>{{ evento.nombre_usuario }}</td>
+            <td>{{ evento.ip|default:"—" }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="4" class="vacio-seccion">Sin eventos registrados.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <table class="tabla">
+      <thead><tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Asunto</th><th>Registro</th><th>Cambios</th></tr></thead>
+      <tbody>
+        {% for fila in filas %}
+          <tr>
+            <td class="sin-corte">{{ fila.fecha|date:"d/m/Y H:i:s" }}</td>
+            <td>{{ fila.usuario.nombre_visible|default:"Sistema" }}</td>
+            <td><span class="etiqueta{% if fila.tipo == '-' %} etiqueta--peligro{% endif %}">{{ fila.accion }}</span></td>
+            <td><a href="{% url 'casos:detalle' fila.asunto.id %}">{{ fila.asunto.folio }}</a></td>
+            <td>{{ fila.registro }}</td>
+            <td>
+              {% for cambio in fila.cambios %}
+                <div class="cambio"><strong>{{ cambio.campo|capfirst }}:</strong> {{ cambio.antes }} → {{ cambio.despues }}</div>
+              {% endfor %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="vacio-seccion">Sin movimientos registrados.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+</div>
+{% include "casos/_paginacion.html" %}
+{% endblock %}

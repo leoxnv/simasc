@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block titulo %}Asuntos{% endblock %}
+
+{% block contenido %}
+<div class="encabezado">
+  <div>
+    <h1>Asuntos</h1>
+    <p class="encabezado__nota">
+      {% if user.puede_supervisar %}Todos los asuntos registrados{% elif user.sede %}Los asuntos de tu sede ({{ user.sede }}){% else %}Los asuntos que tú registraste{% endif %}
+      · {{ paginator.count }} en total
+    </p>
+  </div>
+  <a class="boton boton--primario" href="{% url 'casos:crear' %}">Nuevo asunto</a>
+</div>
+
+<form method="get" class="buscador" role="search">
+  <label class="solo-lectores" for="q">Buscar</label>
+  <input type="search" id="q" name="q" value="{{ busqueda }}"
+         placeholder="Buscar por número de asunto, carpeta, NUC o nombre de una persona">
+  <button class="boton" type="submit">Buscar</button>
+  {% if busqueda %}<a class="boton boton--discreto" href="{% url 'casos:lista' %}">Quitar filtro</a>{% endif %}
+</form>
+
+{% if asuntos %}
+  <div class="tarjeta tarjeta--tabla">
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Asunto</th>
+          <th>Ingreso</th>
+          <th>Carpeta o NUC</th>
+          <th>Unidad de origen</th>
+          <th class="num">Víctimas</th>
+          <th class="num">Imputados</th>
+          <th class="num">Delitos</th>
+          <th>Capturó</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for asunto in asuntos %}
+          <tr>
+            <td>
+              <a class="enlace-fuerte" href="{% url 'casos:detalle' asunto.pk %}">{{ asunto.folio }}</a>
+              {% if asunto.cancelado %}<span class="etiqueta etiqueta--peligro">Cancelado</span>{% endif %}
+            </td>
+            <td class="sin-corte">{{ asunto.fecha_ingreso|date:"d/m/Y" }}</td>
+            <td>
+              {% if asunto.carpeta_investigacion %}{{ asunto.carpeta_investigacion }}{% else %}NUC {{ asunto.nuc }}{% endif %}
+              {% if asunto.sistema == "adolescentes" %}<span class="etiqueta">Adolescentes</span>{% endif %}
+            </td>
+            <td>{{ asunto.unidad_origen }}</td>
+            <td class="num">{{ asunto.n_victimas }}</td>
+            <td class="num">{{ asunto.n_imputados }}</td>
+            <td class="num">{{ asunto.n_delitos }}</td>
+            <td>{{ asunto.creado_por.nombre_visible }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "casos/_paginacion.html" with pagina=page_obj %}
+{% else %}
+  <div class="tarjeta vacio">
+    {% if busqueda %}
+      <p>Ningún asunto coincide con «{{ busqueda }}».</p>
+    {% else %}
+      <p>Todavía no hay asuntos registrados.</p>
+      <a class="boton boton--primario" href="{% url 'casos:crear' %}">Registrar el primero</a>
+    {% endif %}
+  </div>
+{% endif %}
+{% endblock %}

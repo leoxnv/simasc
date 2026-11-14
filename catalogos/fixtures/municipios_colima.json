@@ -1,0 +1,12 @@
+[
+  {"model": "catalogos.municipio", "pk": 1, "fields": {"nombre": "Armería", "clave_inegi": "06001", "activo": true}},
+  {"model": "catalogos.municipio", "pk": 2, "fields": {"nombre": "Colima", "clave_inegi": "06002", "activo": true}},
+  {"model": "catalogos.municipio", "pk": 3, "fields": {"nombre": "Comala", "clave_inegi": "06003", "activo": true}},
+  {"model": "catalogos.municipio", "pk": 4, "fields": {"nombre": "Coquimatlán", "clave_inegi": "06004", "activo": true}},
+  {"model": "catalogos.municipio", "pk": 5, "fields": {"nombre": "Cuauhtémoc", "clave_inegi": "06005", "activo": true}},
+  {"model": "catalogos.municipio", "pk": 6, "fields": {"nombre": "Ixtlahuacán", "clave_inegi": "06006", "activo": true}},
+  {"model": "catalogos.municipio", "pk": 7, "fields": {"nombre": "Manzanillo", "clave_inegi": "06007", "activo": true}},
+  {"model": "catalogos.municipio", "pk": 8, "fields": {"nombre": "Minatitlán", "clave_inegi": "06008", "activo": true}},
+  {"model": "catalogos.municipio", "pk": 9, "fields": {"nombre": "Tecomán", "clave_inegi": "06009", "activo": true}},
+  {"model": "catalogos.municipio", "pk": 10, "fields": {"nombre": "Villa de Álvarez", "clave_inegi": "06010", "activo": true}}
+]

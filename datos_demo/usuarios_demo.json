@@ -1,0 +1,30 @@
+[
+  {
+    "username": "capturista.demo",
+    "first_name": "Carla",
+    "last_name": "Capturista (demo)",
+    "rol": "capturista",
+    "password": "demo-captura-2026"
+  },
+  {
+    "username": "capturista2.demo",
+    "first_name": "César",
+    "last_name": "Capturista (demo)",
+    "rol": "capturista",
+    "password": "demo-captura2-2026"
+  },
+  {
+    "username": "supervisor.demo",
+    "first_name": "Sergio",
+    "last_name": "Supervisor (demo)",
+    "rol": "supervisor",
+    "password": "demo-supervisa-2026"
+  },
+  {
+    "username": "admin.demo",
+    "first_name": "Ana",
+    "last_name": "Administradora (demo)",
+    "rol": "administrador",
+    "password": "demo-administra-2026"
+  }
+]

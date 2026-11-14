@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block titulo %}{{ tipo.label }} · {{ asunto.folio }}{% endblock %}
+
+{% block contenido %}
+<nav class="migas" aria-label="Ubicación">
+  <a href="{% url 'casos:lista' %}">Asuntos</a>
+  <a href="{% url 'casos:detalle' asunto.pk %}">{{ asunto.folio }}</a>
+</nav>
+<h1>{% if object.pk %}Editar: {{ object.nombre_completo }}{% else %}Agregar {{ tipo.label|lower }}{% endif %}</h1>
+
+<form method="post" class="tarjeta">
+  {% csrf_token %}
+  {% include "formularios/errores.html" %}
+
+  {{ form.tipo_persona.as_field_group }}
+
+  <h2 class="seccion">Datos de la persona</h2>
+  <div class="rejilla rejilla--tres">
+    {{ form.nombre.as_field_group }}
+    <div data-depende-de="tipo_persona" data-valores="fisica">{{ form.primer_apellido.as_field_group }}</div>
+    <div data-depende-de="tipo_persona" data-valores="fisica">{{ form.segundo_apellido.as_field_group }}</div>
+    <div data-depende-de="tipo_persona" data-valores="fisica">{{ form.sexo.as_field_group }}</div>
+    <div data-depende-de="tipo_persona" data-valores="fisica">{{ form.edad.as_field_group }}</div>
+    <div data-depende-de="tipo_persona" data-valores="fisica">{{ form.grupo_etario.as_field_group }}</div>
+  </div>
+
+  <h2 class="seccion">Participación y contacto</h2>
+  <div class="rejilla rejilla--tres">
+    {{ form.calidad.as_field_group }}
+    {{ form.telefono.as_field_group }}
+    {{ form.correo.as_field_group }}
+  </div>
+
+  <div class="acciones">
+    <button class="boton boton--primario" type="submit">Guardar</button>
+    <a class="boton boton--discreto" href="{% url 'casos:detalle' asunto.pk %}">Descartar</a>
+  </div>
+</form>
+{% endblock %}

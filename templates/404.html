@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block titulo %}No encontrado{% endblock %}
+
+{% block contenido %}
+<div class="angosto">
+  <h1>No encontramos esa página</h1>
+  <div class="tarjeta">
+    <p>El registro no existe o no está entre los que puedes consultar.</p>
+    <div class="acciones">
+      <a class="boton boton--primario" href="{% url 'casos:lista' %}">Volver a los asuntos</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
