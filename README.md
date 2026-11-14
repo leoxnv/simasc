@@ -2,7 +2,7 @@
 
 Sistema para registrar asuntos de mecanismos alternativos de solución de controversias en materia penal. Pensado para instalarse en el servidor de cada fiscalía.
 
-Estado: **versión de prueba, en construcción.** Funciona la fase 1 (usuarios y roles, captura de asuntos con víctimas, imputados y delitos, bitácora). La fase 2 (seguimiento) ya tiene su modelo de datos, pero todavía no tiene pantallas. El plan completo está al final.
+Estado: **versión de prueba, en construcción.** Funcionan las fases 1 y 2: usuarios y roles, captura de asuntos con víctimas, imputados y delitos, seguimiento del procedimiento (invitaciones, sesiones, acuerdo y cumplimiento) y bitácora. El plan completo está al final.
 
 ## Probarlo en tu computadora
 
@@ -39,8 +39,8 @@ Nadie borra asuntos: se cancelan con un motivo y quedan visibles. Las personas y
 |---|---|
 | `config/` | Configuración. Todo lo que cambia entre fiscalías se lee de `.env`. |
 | `cuentas/` | Usuarios, roles y registro de accesos. |
-| `catalogos/` | Listas que cada fiscalía adapta: sedes, municipios, unidades de origen. |
-| `casos/` | Asuntos, intervinientes y delitos; pantallas y bitácora. |
+| `catalogos/` | Listas que cada fiscalía adapta: sedes, facilitadores, municipios, unidades de origen. |
+| `casos/` | Asuntos, intervinientes, delitos y seguimiento; pantallas y bitácora. |
 | `templates/`, `static/` | Pantallas y estilos. No dependen de internet. |
 | `docs/` | Propuesta de variables de seguimiento. |
 | `datos_demo/` | Usuarios de demostración. No usar en producción. |
@@ -50,7 +50,7 @@ Las claves del diccionario de datos (M1, A2, D5…) están anotadas junto a cada
 ## Plan
 
 1. **Hecho.** Usuarios, roles, captura de asuntos, bitácora.
-2. **En curso.** Seguimiento: mecanismo, sesiones, acuerdo y cumplimiento (ver `docs/propuesta_seguimiento.md`). Listo el modelo de datos; faltan las pantallas.
+2. **Hecho.** Seguimiento: mecanismo, invitaciones, sesiones, acuerdo y cumplimiento, con estatus calculado del asunto (ver `docs/propuesta_seguimiento.md`).
 3. Catálogos ampliados y campos adicionales por fiscalía.
 4. Exportación, reportes, tablero y archivo anonimizado para el ONC.
 5. Importación de históricos desde Excel.

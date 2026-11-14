@@ -5,8 +5,16 @@ from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 
-from casos.models import Asunto, Delito, Interviniente
-from catalogos.models import Municipio, Sede, UnidadOrigen
+from casos.models import (
+    AccionSeguimiento,
+    Acuerdo,
+    Asunto,
+    Delito,
+    Interviniente,
+    Invitacion,
+    Sesion,
+)
+from catalogos.models import Facilitador, Municipio, Sede, UnidadOrigen
 from cuentas.models import Usuario
 
 
@@ -105,8 +113,63 @@ class Command(BaseCommand):
             )
             delito.imputados.add(imputado)
 
+        self._seguimiento(Asunto.objects.get(folio="DEMO-0001"))
+
         self.stdout.write(
             self.style.SUCCESS(
                 "Datos de demostración listos. Usuarios y contraseñas: datos_demo/usuarios_demo.json"
             )
+        )
+
+    def _seguimiento(self, asunto):
+        """Lleva el asunto de ejemplo hasta un acuerdo en cumplimiento."""
+        personas = asunto.intervinientes
+        victima = personas.filter(tipo=Interviniente.Tipo.VICTIMA).first()
+        imputado = personas.filter(tipo=Interviniente.Tipo.IMPUTADO).first()
+        if asunto.invitaciones.exists() or not (victima and imputado):
+            return
+
+        hoy = datetime.date.today()
+        asunto.fecha_solicitud = hoy
+        asunto.forma_solicitud = Asunto.FormaSolicitud.VERBAL
+        asunto.etapa_procesal = Asunto.EtapaProcesal.INICIAL
+        asunto.procedencia = Asunto.Procedencia.CULPOSO
+        asunto.mecanismo = Asunto.Mecanismo.MEDIACION
+        asunto.facilitador, _ = Facilitador.objects.get_or_create(
+            nombre="Facilitadora de ejemplo"
+        )
+        asunto.fecha_aceptacion = hoy
+        asunto.hechos = "Choque entre dos vehículos con daños materiales."
+        asunto.save()
+
+        Invitacion.objects.create(
+            asunto=asunto,
+            persona=imputado,
+            fecha=hoy,
+            medio=Invitacion.Medio.TELEFONO,
+            resultado=Invitacion.Resultado.ACEPTO,
+        )
+        sesion = Sesion.objects.create(
+            asunto=asunto,
+            fecha=hoy,
+            tipo=Sesion.Tipo.CONJUNTA,
+            resultado=Sesion.Resultado.ACUERDO,
+        )
+        sesion.asistentes.set([victima, imputado])
+        acuerdo = Acuerdo.objects.create(
+            asunto=asunto,
+            fecha_celebracion=hoy,
+            lugar_celebracion="Colima, Colima",
+            alcance=Acuerdo.Alcance.TOTAL,
+            obligacion_dar=True,
+            reparacion_restitucion=True,
+            monto_reparacion=8500,
+            forma_cumplimiento=Acuerdo.FormaCumplimiento.DIFERIDO,
+            fecha_limite=hoy + datetime.timedelta(days=90),
+        )
+        AccionSeguimiento.objects.create(
+            acuerdo=acuerdo,
+            fecha=hoy,
+            accion=AccionSeguimiento.Accion.LLAMADA,
+            resultado="Confirma que hará el primer pago en la fecha pactada.",
         )

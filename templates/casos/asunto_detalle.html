@@ -10,7 +10,7 @@
   <div>
     <h1>
       Asunto {{ asunto.folio }}
-      {% if asunto.cancelado %}<span class="etiqueta etiqueta--peligro">Cancelado</span>{% endif %}
+      <span class="etiqueta etiqueta--{{ asunto.estatus.value }}">{{ asunto.estatus.label }}</span>
     </h1>
     <p class="encabezado__nota">
       Capturó {{ asunto.creado_por.nombre_visible }} el {{ asunto.creado_en|date:"d/m/Y H:i" }}
@@ -108,4 +108,6 @@
     <p class="vacio-seccion">Aún no hay delitos registrados.</p>
   {% endfor %}
 </section>
+
+{% include "casos/_seguimiento.html" %}
 {% endblock %}

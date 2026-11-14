@@ -17,8 +17,15 @@
   <label class="solo-lectores" for="q">Buscar</label>
   <input type="search" id="q" name="q" value="{{ busqueda }}"
          placeholder="Buscar por número de asunto, carpeta, NUC o nombre de una persona">
+  <label class="solo-lectores" for="estatus">Estatus</label>
+  <select id="estatus" name="estatus">
+    <option value="">Todos los estatus</option>
+    {% for valor, etiqueta in opciones_estatus %}
+      <option value="{{ valor }}"{% if valor == estatus %} selected{% endif %}>{{ etiqueta }}</option>
+    {% endfor %}
+  </select>
   <button class="boton" type="submit">Buscar</button>
-  {% if busqueda %}<a class="boton boton--discreto" href="{% url 'casos:lista' %}">Quitar filtro</a>{% endif %}
+  {% if busqueda or estatus %}<a class="boton boton--discreto" href="{% url 'casos:lista' %}">Quitar filtros</a>{% endif %}
 </form>
 
 {% if asuntos %}
@@ -29,7 +36,7 @@
           <th>Asunto</th>
           <th>Ingreso</th>
           <th>Carpeta o NUC</th>
-          <th>Unidad de origen</th>
+          <th>Estatus</th>
           <th class="num">Víctimas</th>
           <th class="num">Imputados</th>
           <th class="num">Delitos</th>
@@ -41,14 +48,13 @@
           <tr>
             <td>
               <a class="enlace-fuerte" href="{% url 'casos:detalle' asunto.pk %}">{{ asunto.folio }}</a>
-              {% if asunto.cancelado %}<span class="etiqueta etiqueta--peligro">Cancelado</span>{% endif %}
             </td>
             <td class="sin-corte">{{ asunto.fecha_ingreso|date:"d/m/Y" }}</td>
             <td>
               {% if asunto.carpeta_investigacion %}{{ asunto.carpeta_investigacion }}{% else %}NUC {{ asunto.nuc }}{% endif %}
               {% if asunto.sistema == "adolescentes" %}<span class="etiqueta">Adolescentes</span>{% endif %}
             </td>
-            <td>{{ asunto.unidad_origen }}</td>
+            <td><span class="etiqueta etiqueta--{{ asunto.estatus.value }}">{{ asunto.estatus.label }}</span></td>
             <td class="num">{{ asunto.n_victimas }}</td>
             <td class="num">{{ asunto.n_imputados }}</td>
             <td class="num">{{ asunto.n_delitos }}</td>
@@ -61,8 +67,8 @@
   {% include "casos/_paginacion.html" with pagina=page_obj %}
 {% else %}
   <div class="tarjeta vacio">
-    {% if busqueda %}
-      <p>Ningún asunto coincide con «{{ busqueda }}».</p>
+    {% if busqueda or estatus %}
+      <p>Ningún asunto coincide con lo que buscas.</p>
     {% else %}
       <p>Todavía no hay asuntos registrados.</p>
       <a class="boton boton--primario" href="{% url 'casos:crear' %}">Registrar el primero</a>

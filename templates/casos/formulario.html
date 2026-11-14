@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block titulo %}{{ titulo }} · {{ asunto.folio }}{% endblock %}
+
+{% block contenido %}
+<nav class="migas" aria-label="Ubicación">
+  <a href="{% url 'casos:lista' %}">Asuntos</a>
+  <a href="{% url 'casos:detalle' asunto.pk %}">{{ asunto.folio }}</a>
+</nav>
+<h1>{{ titulo }}</h1>
+{% if nota %}<p class="encabezado__nota">{{ nota }}</p>{% endif %}
+
+<form method="post" class="tarjeta">
+  {% csrf_token %}
+  {% include "formularios/errores.html" %}
+
+  {% for bloque in form.bloques %}
+    {% if bloque.titulo %}<h2 class="seccion{% if forloop.first %} seccion--primera{% endif %}">{{ bloque.titulo }}</h2>{% endif %}
+    <div class="rejilla">
+      {% for celda in bloque.celdas %}
+        <div{% if celda.ancha %} class="rejilla__ancha"{% endif %}{% if celda.depende_de %} data-depende-de="{{ celda.depende_de }}" data-valores="{{ celda.valores }}"{% endif %}>
+          {{ celda.campo.as_field_group }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+
+  <div class="acciones">
+    <button class="boton boton--primario" type="submit">Guardar</button>
+    <a class="boton boton--discreto" href="{% url 'casos:detalle' asunto.pk %}">Descartar</a>
+  </div>
+</form>
+{% endblock %}

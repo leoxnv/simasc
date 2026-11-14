@@ -1,8 +1,14 @@
-# Propuesta de variables de seguimiento (fase 2)
+# Variables de seguimiento (fase 2)
 
-Estado: **borrador para validar**. Nada de esto está programado todavía.
+Estado: **programado**. Falta la validación del área jurídica (ver «Fuentes»).
 
-El diccionario actual (25 variables) cubre la identificación del asunto y el delito. Esta propuesta agrega lo que pasa después: el mecanismo, las sesiones, el acuerdo y su cumplimiento. Cada variable cita el artículo que la respalda.
+El diccionario original (25 variables) cubre la identificación del asunto y el delito. Estas variables agregan lo que pasa después: el mecanismo, las sesiones, el acuerdo y su cumplimiento. Cada una cita el artículo que la respalda.
+
+Al programarlo hubo tres ajustes respecto de la propuesta:
+
+- **C2 «Forma de conclusión» no se captura**, se deduce: si hay acuerdo, su alcance (total o parcial); si no, la conclusión anticipada.
+- **Una conclusión sin acuerdo cierra el mecanismo**: ya no admite invitaciones, sesiones ni acuerdo, salvo que supervisión lo reabra. Un asunto no admitido tampoco los admite.
+- **Solo supervisión puede quitar un acuerdo**, porque se lleva consigo su seguimiento.
 
 ## Fuentes
 

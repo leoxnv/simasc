@@ -6,10 +6,9 @@
 <p class="encabezado__nota">Quién hizo qué y cuándo. Los registros de la bitácora no se pueden editar ni borrar desde el sistema.</p>
 
 <nav class="pestanas" aria-label="Tipo de registro">
-  <a href="?ver=asuntos" {% if ver == "asuntos" %}aria-current="page"{% endif %}>Asuntos</a>
-  <a href="?ver=personas" {% if ver == "personas" %}aria-current="page"{% endif %}>Personas</a>
-  <a href="?ver=delitos" {% if ver == "delitos" %}aria-current="page"{% endif %}>Delitos</a>
-  <a href="?ver=accesos" {% if ver == "accesos" %}aria-current="page"{% endif %}>Accesos al sistema</a>
+  {% for clave, titulo in pestanas %}
+    <a href="?ver={{ clave }}" {% if ver == clave %}aria-current="page"{% endif %}>{{ titulo }}</a>
+  {% endfor %}
 </nav>
 
 <div class="tarjeta tarjeta--tabla">
@@ -41,7 +40,7 @@
             <td class="sin-corte">{{ fila.fecha|date:"d/m/Y H:i:s" }}</td>
             <td>{{ fila.usuario.nombre_visible|default:"Sistema" }}</td>
             <td><span class="etiqueta{% if fila.tipo == '-' %} etiqueta--peligro{% endif %}">{{ fila.accion }}</span></td>
-            <td><a href="{% url 'casos:detalle' fila.asunto.id %}">{{ fila.asunto.folio }}</a></td>
+            <td>{% if fila.asunto %}<a href="{% url 'casos:detalle' fila.asunto.id %}">{{ fila.asunto.folio }}</a>{% else %}—{% endif %}</td>
             <td>{{ fila.registro }}</td>
             <td>
               {% for cambio in fila.cambios %}

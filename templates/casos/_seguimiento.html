@@ -1,0 +1,253 @@
+{# Procedimiento, invitaciones, sesiones, conclusión, acuerdo y su cumplimiento. #}
+
+<section class="tarjeta" id="procedimiento">
+  <div class="seccion-encabezado">
+    <h2 class="seccion seccion--primera">Procedimiento</h2>
+    {% if puede_editar %}
+      <a class="boton" href="{% url 'casos:procedimiento' asunto.pk %}">Editar procedimiento</a>
+    {% endif %}
+  </div>
+  <dl class="ficha">
+    <div><dt>Fecha de la solicitud</dt><dd>{{ asunto.fecha_solicitud|date:"d/m/Y"|default:"Sin registrar" }}</dd></div>
+    <div><dt>Forma de la solicitud</dt><dd>{{ asunto.get_forma_solicitud_display|default:"Sin registrar" }}</dd></div>
+    <div><dt>Etapa del proceso penal</dt><dd>{{ asunto.get_etapa_procesal_display|default:"Sin registrar" }}</dd></div>
+    <div><dt>Supuesto de procedencia</dt><dd>{{ asunto.get_procedencia_display|default:"Sin registrar" }}</dd></div>
+    {% if asunto.admisible == "no" %}
+      <div><dt>¿Se pidió reconsideración?</dt><dd>{{ asunto.get_reconsideracion_display|default:"Sin registrar" }}</dd></div>
+    {% else %}
+      <div>
+        <dt>Mecanismo</dt>
+        <dd>
+          {{ asunto.get_mecanismo_display|default:"Sin registrar" }}
+          {% if asunto.mecanismo_sustituto %}<br><span class="dato-secundario">Sustituido por {{ asunto.get_mecanismo_sustituto_display|lower }}</span>{% endif %}
+        </dd>
+      </div>
+      <div><dt>Facilitador</dt><dd>{{ asunto.facilitador|default_if_none:"Sin asignar" }}</dd></div>
+      <div><dt>Aceptaron sujetarse al mecanismo</dt><dd>{{ asunto.fecha_aceptacion|date:"d/m/Y"|default:"Sin registrar" }}</dd></div>
+    {% endif %}
+  </dl>
+  {% if asunto.admisible == "no" and asunto.motivo_no_admision %}
+    <div class="texto-largo"><h3>Motivo de no admisión</h3><p>{{ asunto.motivo_no_admision|linebreaksbr }}</p></div>
+  {% endif %}
+  {% if asunto.hechos %}
+    <div class="texto-largo"><h3>Breve relación de los hechos</h3><p>{{ asunto.hechos|linebreaksbr }}</p></div>
+  {% endif %}
+</section>
+
+{% if not asunto.admite_seguimiento %}
+  {% if asunto.admisible == "no" %}
+    <section class="tarjeta">
+      <p class="vacio-seccion">Este asunto no fue admitido, por lo que no lleva invitaciones, sesiones ni acuerdo.</p>
+    </section>
+  {% endif %}
+{% endif %}
+
+{% if asunto.admisible == "si" %}
+<section class="tarjeta" id="invitaciones">
+  <div class="seccion-encabezado">
+    <h2 class="seccion seccion--primera">Invitaciones <span class="conteo">{{ invitaciones|length }}</span></h2>
+    {% if puede_editar and asunto.mecanismo_abierto %}
+      <a class="boton" href="{% url 'casos:invitacion_crear' asunto.pk %}">Registrar invitación</a>
+    {% endif %}
+  </div>
+  {% if asunto.dias_sin_invitar %}
+    <div class="aviso aviso--warning">
+      Han pasado {{ asunto.dias_sin_invitar }} días hábiles desde el ingreso y no hay invitación registrada.
+      El plazo para invitar al requerido es de {{ plazo_invitacion }} días hábiles (art. 14).
+    </div>
+  {% endif %}
+  {% if invitaciones %}
+    <div class="tabla-contenedor">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>Fecha</th><th>Persona invitada</th><th>Medio</th><th>Resultado</th>
+            {% if puede_editar %}<th><span class="solo-lectores">Acciones</span></th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for invitacion in invitaciones %}
+            <tr>
+              <td class="sin-corte">{{ invitacion.fecha|date:"d/m/Y" }}</td>
+              <td>{{ invitacion.persona.nombre_completo }} <span class="dato-secundario">({{ invitacion.persona.get_tipo_display|lower }})</span></td>
+              <td>{{ invitacion.get_medio_display }}{% if invitacion.medio_otro %}: {{ invitacion.medio_otro }}{% endif %}</td>
+              <td><span class="etiqueta etiqueta--{{ invitacion.resultado }}">{{ invitacion.get_resultado_display }}</span></td>
+              {% if puede_editar %}
+                <td class="fila-acciones">
+                  <a href="{% url 'casos:invitacion_editar' asunto.pk invitacion.pk %}">Editar</a>
+                  <a class="enlace-peligro" href="{% url 'casos:invitacion_eliminar' asunto.pk invitacion.pk %}">Quitar</a>
+                </td>
+              {% endif %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="vacio-seccion">Aún no hay invitaciones registradas.</p>
+  {% endif %}
+</section>
+
+<section class="tarjeta" id="sesiones">
+  <div class="seccion-encabezado">
+    <h2 class="seccion seccion--primera">Sesiones <span class="conteo">{{ sesiones|length }}</span></h2>
+    {% if puede_editar and asunto.mecanismo_abierto %}
+      <a class="boton" href="{% url 'casos:sesion_crear' asunto.pk %}">Registrar sesión</a>
+    {% endif %}
+  </div>
+  {% if sesiones %}
+    <div class="tabla-contenedor">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>Fecha</th><th>Tipo</th><th>Asistentes</th><th>Intérprete</th><th>Resultado</th>
+            {% if puede_editar %}<th><span class="solo-lectores">Acciones</span></th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for sesion in sesiones %}
+            <tr>
+              <td class="sin-corte">{{ sesion.fecha|date:"d/m/Y" }}</td>
+              <td>{{ sesion.get_tipo_display }}</td>
+              <td>{% for persona in sesion.asistentes.all %}{{ persona.nombre_completo }}{% if not forloop.last %}; {% endif %}{% endfor %}</td>
+              <td>{{ sesion.get_interprete_display }}</td>
+              <td>{{ sesion.get_resultado_display }}</td>
+              {% if puede_editar %}
+                <td class="fila-acciones">
+                  <a href="{% url 'casos:sesion_editar' asunto.pk sesion.pk %}">Editar</a>
+                  <a class="enlace-peligro" href="{% url 'casos:sesion_eliminar' asunto.pk sesion.pk %}">Quitar</a>
+                </td>
+              {% endif %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="vacio-seccion">Aún no hay sesiones registradas.</p>
+  {% endif %}
+</section>
+
+<section class="tarjeta" id="acuerdo">
+  {% if acuerdo %}
+    <div class="seccion-encabezado">
+      <h2 class="seccion seccion--primera">Acuerdo</h2>
+      {% if puede_editar %}
+        <div class="encabezado__acciones">
+          <a class="boton" href="{% url 'casos:acuerdo_editar' asunto.pk %}">Editar acuerdo</a>
+          {% if user.puede_supervisar %}
+            <a class="boton boton--peligro" href="{% url 'casos:acuerdo_eliminar' asunto.pk %}">Quitar acuerdo</a>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+    <dl class="ficha">
+      <div><dt>Celebración</dt><dd>{{ acuerdo.fecha_celebracion|date:"d/m/Y" }}, {{ acuerdo.lugar_celebracion }}</dd></div>
+      <div><dt>Alcance</dt><dd>{{ acuerdo.get_alcance_display }}</dd></div>
+      <div><dt>Obligaciones</dt><dd>{{ acuerdo.obligaciones|join:", " }}</dd></div>
+      <div><dt>Reparación</dt><dd>{{ acuerdo.reparaciones|join:"; "|default:"Sin registrar" }}</dd></div>
+      <div><dt>Monto de la reparación</dt><dd>{% if acuerdo.monto_reparacion is not None %}${{ acuerdo.monto_reparacion|floatformat:"2g" }}{% else %}Sin reparación económica{% endif %}</dd></div>
+      <div>
+        <dt>Cumplimiento pactado</dt>
+        <dd>{{ acuerdo.get_forma_cumplimiento_display }}{% if acuerdo.fecha_limite %}, a más tardar el {{ acuerdo.fecha_limite|date:"d/m/Y" }}{% endif %}</dd>
+      </div>
+      <div><dt>Validación por licenciado en derecho</dt><dd>{{ acuerdo.fecha_validacion|date:"d/m/Y"|default:"Sin registrar" }}</dd></div>
+      <div>
+        <dt>Aprobación</dt>
+        <dd>
+          {% if acuerdo.autoridad_aprueba %}{{ acuerdo.get_autoridad_aprueba_display }}{% if acuerdo.fecha_aprobacion %}, {{ acuerdo.fecha_aprobacion|date:"d/m/Y" }}{% endif %}
+          {% else %}Sin registrar{% endif %}
+        </dd>
+      </div>
+    </dl>
+  {% elif asunto.fecha_conclusion %}
+    <div class="seccion-encabezado">
+      <h2 class="seccion seccion--primera">Conclusión sin acuerdo</h2>
+      {% if puede_editar %}
+        <div class="encabezado__acciones">
+          <a class="boton" href="{% url 'casos:conclusion' asunto.pk %}">Editar</a>
+          {% if user.puede_supervisar %}
+            <form method="post" action="{% url 'casos:conclusion_quitar' asunto.pk %}">
+              {% csrf_token %}
+              <button class="boton" type="submit">Reabrir el mecanismo</button>
+            </form>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+    <dl class="ficha">
+      <div><dt>Fecha de conclusión</dt><dd>{{ asunto.fecha_conclusion|date:"d/m/Y" }}</dd></div>
+      <div>
+        <dt>Causa</dt>
+        <dd>{{ asunto.get_causa_conclusion_display }}{% if asunto.causa_conclusion_otra %}: {{ asunto.causa_conclusion_otra }}{% endif %}</dd>
+      </div>
+    </dl>
+  {% else %}
+    <div class="seccion-encabezado">
+      <h2 class="seccion seccion--primera">Acuerdo o conclusión</h2>
+      {% if puede_editar and asunto.mecanismo_abierto %}
+        <div class="encabezado__acciones">
+          <a class="boton" href="{% url 'casos:acuerdo_crear' asunto.pk %}">Registrar acuerdo</a>
+          <a class="boton" href="{% url 'casos:conclusion' asunto.pk %}">Concluir sin acuerdo</a>
+        </div>
+      {% endif %}
+    </div>
+    <p class="vacio-seccion">El mecanismo sigue abierto: aún no hay acuerdo ni conclusión.</p>
+  {% endif %}
+</section>
+
+{% if acuerdo %}
+<section class="tarjeta" id="cumplimiento">
+  <div class="seccion-encabezado">
+    <h2 class="seccion seccion--primera">
+      Cumplimiento del acuerdo
+      <span class="etiqueta etiqueta--{{ acuerdo.estado_cumplimiento }}">{{ acuerdo.get_estado_cumplimiento_display }}</span>
+    </h2>
+    {% if puede_editar %}
+      <div class="encabezado__acciones">
+        <a class="boton" href="{% url 'casos:cumplimiento' asunto.pk %}">Actualizar cumplimiento</a>
+        <a class="boton" href="{% url 'casos:accion_crear' asunto.pk %}">Registrar acción</a>
+      </div>
+    {% endif %}
+  </div>
+  {% if acuerdo.estado_cumplimiento != "en_curso" %}
+    <dl class="ficha">
+      <div><dt>Fecha</dt><dd>{{ acuerdo.fecha_cierre|date:"d/m/Y"|default:"Sin registrar" }}</dd></div>
+      <div><dt>Efecto</dt><dd>{{ acuerdo.get_efecto_display|default:"Sin registrar" }}</dd></div>
+      {% if acuerdo.estado_cumplimiento != "cumplido" %}
+        <div><dt>Comunicación al MP o al juez</dt><dd>{{ acuerdo.fecha_comunicacion|date:"d/m/Y"|default:"Sin registrar" }}</dd></div>
+      {% endif %}
+    </dl>
+  {% endif %}
+  {% if acciones %}
+    <div class="tabla-contenedor{% if acuerdo.estado_cumplimiento != 'en_curso' %} tabla-contenedor--separada{% endif %}">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>Fecha</th><th>Acción de seguimiento</th><th>Resultado</th>
+            {% if puede_editar %}<th><span class="solo-lectores">Acciones</span></th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for accion in acciones %}
+            <tr>
+              <td class="sin-corte">{{ accion.fecha|date:"d/m/Y" }}</td>
+              <td>{{ accion.get_accion_display }}{% if accion.accion_otra %}: {{ accion.accion_otra }}{% endif %}</td>
+              <td>{{ accion.resultado|default:"—" }}</td>
+              {% if puede_editar %}
+                <td class="fila-acciones">
+                  <a href="{% url 'casos:accion_editar' asunto.pk accion.pk %}">Editar</a>
+                  <a class="enlace-peligro" href="{% url 'casos:accion_eliminar' asunto.pk accion.pk %}">Quitar</a>
+                </td>
+              {% endif %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="vacio-seccion">Aún no hay acciones de seguimiento registradas.</p>
+  {% endif %}
+</section>
+{% endif %}
+{% endif %}

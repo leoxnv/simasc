@@ -345,6 +345,10 @@ a:hover {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.rejilla__ancha {
+  grid-column: 1 / -1;
+}
+
 .campo {
   margin-bottom: 16px;
 }
@@ -455,6 +459,19 @@ a:hover {
 .buscador input {
   flex: 1;
   min-width: 240px;
+}
+
+.buscador select {
+  padding: 8px 10px;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--tinta);
+  font: inherit;
+}
+
+.seccion-encabezado .encabezado__acciones form {
+  display: contents;
 }
 
 /* ---------- Tablas ---------- */
@@ -605,9 +622,63 @@ a:hover {
   vertical-align: middle;
 }
 
-.etiqueta--peligro {
+.etiqueta--peligro,
+.etiqueta--cancelado,
+.etiqueta--no_admitido,
+.etiqueta--acuerdo_incumplido,
+.etiqueta--incumplido,
+.etiqueta--rechazo {
   background: var(--peligro-tenue);
   color: var(--peligro);
+}
+
+.etiqueta--acuerdo_cumplido,
+.etiqueta--cumplido,
+.etiqueta--acepto {
+  background: var(--verde-tenue);
+  color: var(--verde-oscuro);
+}
+
+.etiqueta--acuerdo_en_cumplimiento,
+.etiqueta--acuerdo_parcial,
+.etiqueta--en_curso,
+.etiqueta--parcial,
+.etiqueta--en_invitacion,
+.etiqueta--en_sesiones,
+.etiqueta--no_localizado {
+  background: var(--aviso-tenue);
+  color: var(--aviso);
+}
+
+.dato-secundario {
+  font-weight: 400;
+  color: var(--tinta-suave);
+  font-size: 0.88rem;
+}
+
+.texto-largo {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--borde);
+}
+
+.texto-largo h3 {
+  font-size: 0.76rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--tinta-suave);
+}
+
+.texto-largo p {
+  margin: 4px 0 0;
+  max-width: 75ch;
+}
+
+.tabla-contenedor--separada {
+  margin-top: 16px;
+  padding-top: 6px;
+  border-top: 1px solid var(--borde);
 }
 
 .avisos {
